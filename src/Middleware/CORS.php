@@ -26,7 +26,7 @@ class CORS implements LayerInterface
      * Handler
      *
      * @param $object
-     * @param Closure $next
+     * @param \Closure $next
      */
     public function peel($object, \Closure $next){
 
@@ -38,7 +38,7 @@ class CORS implements LayerInterface
 
         $response->setHeader('Access-Control-Allow-Origin', '*');
         $response->setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding, APIToken, APIKey');
-        $response->setHeader('Access-Control-Allow-Method', 'POST, GET, OPTIONS, DELETE, PUT, PATCH');
+        $response->setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS, DELETE, PUT, PATCH');
 
         return $response;
     }
