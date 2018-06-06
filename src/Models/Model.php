@@ -49,8 +49,7 @@ abstract class Model
      * @return  object
      */
     public function load( $id ) {
-        $sql = 'SELECT * FROM `' . $this->tableName .
-            '` WHERE `'.$this->primaryKey.'`='.(int)$id; //!
+        $sql = 'SELECT * FROM `' . $this->tableName .' ` WHERE `'.$this->primaryKey.'`='.(int)$id; //!
 
         return $this->dbo->setQuery($sql)->getResult($this);
     }
@@ -60,15 +59,42 @@ abstract class Model
      *
      * @return bool
      */
-    public function save() {
-        //@TODO: Implement this
+    public function save($params) {
+        $sql = 'INSERT INTO `'.$this->tableName.'`
+        (`'.implode('`, `', array_keys($params)).'`)
+        VALUES("'.implode('", "', array_values($params)).'")';
+
+        return $this->dbo->setQuery($sql);
+    }
+
+    /**
+     * Update record state to db
+     *
+     * @return bool
+     */
+    public function update($params, $where) {
+
+        if(!empty($params)){
+            $updateParams = '';
+            foreach($params as $name => $param){
+                $updateParams .= '`'.$name.'` = "'.$param.'",';
+            }
+
+            $sql = 'UPDATE  `'.$this->tableName.'` SET
+            '.rtrim($updateParams, ',').'
+            WHERE '.$where.' ';
+
+            return $this->dbo->setQuery($sql);
+        }
     }
 
     /**
      * Delete record from DB
      */
-    public function delete() {
+    public function delete( $id ) {
         //@TODO: Implement this
+        $sql = 'DELETE FROM `'.$this->tableName.'` WHERE ` '.$this->primaryKey.'`='.(int)$id;
+        return $this->dbo->setQuery($sql);
     }
 
     /**

@@ -46,4 +46,16 @@ class UserModel extends Model
 
         return $this->dbo->setQuery($sql)->getResult($this);
     }
+
+    /**
+     * Find user before sign up by login (email)
+     *
+     * @param $login
+     *
+     * @return mixed
+     */
+    public function findByEmailBeforeSignUp($login){
+        $sql = sprintf("SELECT * FROM `%s` WHERE `email`='%s'", $this->tableName, $login);
+        return $this->dbo->setQuery($sql)->getResult($this);
+    }
 }

@@ -47,11 +47,6 @@ class RouteMiddlewareGateway
             ->layer($mw_instances)
             ->peel($subject, $core);
 
-        // Ensure it's Response subclass or wrap with JsonResponse:
-        if(!($response instanceof Response)){
-            $response = new JsonResponse($response);
-        }
-
         return  $response;
     }
 }
