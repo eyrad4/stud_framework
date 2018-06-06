@@ -117,4 +117,26 @@ class UserController
         ];
         return $model->update($params);
     }
+
+    /**
+     * Get user info by token
+     *
+     * @param Request $request
+     * @param UserModel $model
+     *
+     * @return mixed
+     * @throws AuthRequiredException
+     */
+    public function userinfo(Request $request, UserModel $model, RoleModel $roleModel, DBOConnectorInterface $dbo) {
+        if($token = $request->getHeader('X-Auth')){
+            if($user = $model->findByToken($token)){
+                return ['token' => $user->token, 'userId' => $user->id, 'login' => $user->email, 'userRole' => $roleModel->findByRoleId($user->role)];
+            }else{
+                throw new AuthRequiredException('User not exist');
+            }
+
+        }else{
+            throw new AuthRequiredException('User not exist');
+        }
+    }
 }
