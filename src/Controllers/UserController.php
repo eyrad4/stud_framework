@@ -13,8 +13,26 @@ use Mindk\Framework\DB\DBOConnectorInterface;
  */
 class UserController
 {
-    public function register(Request $request, UserModel $model) {
-        //@TODO: Implement
+    public function register(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
+        if( !empty($request->get('login', '', 'string'))
+            AND !empty($request->get('password', '', 'string'))
+            AND !empty($request->get('name', '', 'string'))){
+            if($login = $request->get('login', '', 'string')) {
+                $user = $model->findByEmailBeforeSignUp($login);
+            }
+            if(!empty($user)) {
+                throw new AuthRequiredException('User already exist');
+            }
+            $params = [
+                'email' => $login,
+                'password' => md5($request->get('password', '', 'string')),
+                'name' => $request->get('name', '', 'string')
+            ];
+
+            return $model->save($params);
+        }else{
+            throw new AuthRequiredException('Not all required fields are filled in');
+        }
     }
 
     /**
