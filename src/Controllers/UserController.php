@@ -14,6 +14,15 @@ use Mindk\Framework\DB\DBOConnectorInterface;
  */
 class UserController
 {
+    /**
+     * Sign up
+     *
+     * @param Request $request
+     * @param UserModel $model
+     *
+     * @return mixed
+     * @throws AuthRequiredException
+     */
     public function register(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
         if( !empty($request->get('login', '', 'string'))
             AND !empty($request->get('password', '', 'string'))
