@@ -71,7 +71,28 @@ class UserController
 
     }
 
-    public function logout(Request $request) {
-        //@TODO: Implement
+    /**
+     * Logout
+     *
+     * @param Request $request
+     * @param UserModel $model
+     *
+     * @return mixed
+     * @throws AuthRequiredException
+     */
+    public function logout(Request $request, UserModel $model, RoleModel $roleModel, DBOConnectorInterface $dbo) {
+        if($token = $request->getHeader('X-Auth')){
+            if($user = $model->findByToken($token)){
+                $params = [
+                    'token' => ''
+                ];
+                return $model->update($params, '`id`=' . (int)$user->id . '');;
+            }else{
+                throw new AuthRequiredException('User is not exist');
+            }
+
+        }else{
+            throw new AuthRequiredException('User not exist');
+        }
     }
 }
