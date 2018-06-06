@@ -12,6 +12,7 @@ class AuthService
      * @var null Current user instance
      */
     protected static $user = null;
+    protected static $userRole = null;
 
     /**
      * Set current user
@@ -32,14 +33,35 @@ class AuthService
     }
 
     /**
+     * Get current user instance
+     *
+     * @return mixed
+     */
+    public static function getUserRoleName() {
+
+        return self::$userRole;
+    }
+
+    /**
+     * Get current user instance
+     *
+     * @return mixed
+     */
+    public static function setUserRoleName($role) {
+
+        self::$userRole = $role;
+    }
+
+    /**
      * Check if current user has requested roles
      *
      * @return bool
      */
     public static function checkRoles($roles) {
         $roles = (array)$roles;
-        $user = AuthService::getUser();
-        $userRole = empty($user) ? 'guest' : self::$user->role;
+        //$user = AuthService::getUser();
+        $role = AuthService::getUserRoleName();
+        $userRole = empty($role->name) ? 'guest' : $role->name;
 
         return in_array($userRole, $roles);
     }

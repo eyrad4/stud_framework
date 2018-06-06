@@ -5,6 +5,7 @@ namespace Mindk\Framework\Middleware;
 use Mindk\Framework\Auth\AuthService;
 use Mindk\Framework\Http\Request\Request;
 use Mindk\Framework\Models\UserModel;
+use Mindk\Framework\Models\RoleModel;
 use Optimus\Onion\LayerInterface;
 
 /**
@@ -24,13 +25,19 @@ class Auth implements LayerInterface
     protected $userModel;
 
     /**
+     * @var UserModel
+     */
+    protected $roleModel;
+
+    /**
      * Auth constructor.
      * @param Request $request
      */
-    public function __construct(Request $request, UserModel $model)
+    public function __construct(Request $request, UserModel $model, RoleModel $role)
     {
         $this->request = $request;
         $this->userModel = $model;
+        $this->roleModel = $role;
     }
 
     /**
@@ -45,6 +52,9 @@ class Auth implements LayerInterface
         // Assuming $object is route object:
         if($token = $this->request->getHeader('X-Auth')){
             if($user = $this->userModel->findByToken($token)){
+                if($role = $this->roleModel->findByRoleId($user->role)){
+                    AuthService::setUserRoleName($role);
+                }
                 AuthService::setUser($user);
             }
         }
