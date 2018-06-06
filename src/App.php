@@ -2,7 +2,7 @@
 
 namespace Mindk\Framework;
 
-require(dirname(__DIR__).'/vendor/autoload.php');
+require('../vendor/autoload.php');
 
 use Mindk\Framework\Exceptions\NotFoundException;
 use Mindk\Framework\Middleware\RouteMiddlewareGateway;
