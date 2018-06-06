@@ -95,4 +95,26 @@ class UserController
             throw new AuthRequiredException('User not exist');
         }
     }
+
+    /**
+     * Reset password
+     *
+     * @param Request $request
+     * @param UserModel $model
+     *
+     * @return mixed
+     * @throws AuthRequiredException
+     */
+    public function resetpassword(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
+        if($login = $request->get('login', '', 'string')) {
+            $user = $model->findByEmailBeforeSignUp($login);
+        }
+        if(empty($user)) {
+            throw new AuthRequiredException('User not exist');
+        }
+        $params = [
+            'password' => md5($request->get('password', '', 'string'))
+        ];
+        return $model->update($params);
+    }
 }
