@@ -136,8 +136,30 @@ class Request
      */
     public function filterVar($data, string $type = 'raw') {
 
-        //@TODO: Add some filtration for data here!
+        switch ($type){
+            case 'string':
+                return  filter_var($data, FILTER_SANITIZE_STRING);
+                break;
+            case 'integer':
+                return  filter_var($data, FILTER_SANITIZE_NUMBER_INT);
+                break;
+            case 'float':
+                return  filter_var($data, FILTER_SANITIZE_NUMBER_FLOAT);
+                break;
+            case 'email':
+                return  filter_var($data, FILTER_VALIDATE_EMAIL);
+                break;
+            case 'array':
+                if(!empty($data)){
+                    return filter_var_array($data, FILTER_SANITIZE_STRING,FILTER_SANITIZE_NUMBER_INT);
+                }else{
+                    return '';
+                }
+                break;
+            default:
+                return filter_var($data, FILTER_UNSAFE_RAW);
+                break;
+        }
 
-        return $data;
     }
 }
