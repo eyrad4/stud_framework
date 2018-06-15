@@ -23,7 +23,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function register(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
+    public function register(Request $request, UserModel $model) {
         if( !empty($request->get('login', '', 'string'))
             AND !empty($request->get('password', '', 'string'))
             AND !empty($request->get('name', '', 'string'))){
@@ -54,7 +54,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function login(Request $request, UserModel $model, RoleModel $roleModel, DBOConnectorInterface $dbo) {
+    public function login(Request $request, UserModel $model, RoleModel $roleModel) {
 
         if( !empty($request->get('login', '', 'string'))
             AND !empty($request->get('password', '', 'string'))) {
@@ -72,8 +72,8 @@ class UserController
                 //'token_expire' => $user->tokenExpire
             ];
 
-            $model->update($params, '`id`=' . (int)$user->id . '');
-            return ['token' => $user->token, 'userId' => $user->id, 'login' => $login, 'userRole' => $roleModel->findByRoleId($user->role)];
+            $model->save($params, '`id`=' . (int)$user->id . '');
+            return ['token' => $user->token, 'userId' => $user->id, 'userLogin' => $login, 'userRole' => $roleModel->findByRoleId($user->role)];
         }else{
             throw new AuthRequiredException('Not all required fields are filled in');
         }
@@ -89,17 +89,12 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function logout(Request $request, UserModel $model, RoleModel $roleModel, DBOConnectorInterface $dbo) {
-        if($token = $request->getHeader('X-Auth')){
-            if($user = $model->findByToken($token)){
-                $params = [
-                    'token' => ''
-                ];
-                return $model->update($params, '`id`=' . (int)$user->id . '');;
-            }else{
-                throw new AuthRequiredException('User is not exist');
-            }
-
+    public function logout(Request $request, UserModel $model) {
+        if($userid = $request->get('id', '', 'integer')) {
+            $params = [
+                'token' => ''
+            ];
+            return $model->save($params, '`id`=' . (int)$userid . '');
         }else{
             throw new AuthRequiredException('User not exist');
         }
@@ -114,7 +109,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function resetpassword(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
+    public function resetpassword(Request $request, UserModel $model) {
         if($login = $request->get('login', '', 'string')) {
             $user = $model->findByEmailBeforeSignUp($login);
         }
@@ -124,7 +119,7 @@ class UserController
         $params = [
             'password' => md5($request->get('password', '', 'string'))
         ];
-        return $model->update($params);
+        return $model->save($params);
     }
 
     /**
@@ -136,7 +131,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function userinfo(Request $request, UserModel $model, RoleModel $roleModel, DBOConnectorInterface $dbo) {
+    public function userinfo(Request $request, UserModel $model, RoleModel $roleModel) {
         if($token = $request->getHeader('X-Auth')){
             if($user = $model->findByToken($token)){
                 return ['token' => $user->token, 'userId' => $user->id, 'login' => $user->email, 'userRole' => $roleModel->findByRoleId($user->role)];
