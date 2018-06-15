@@ -23,7 +23,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function register(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
+    public function register(Request $request, UserModel $model) {
         if( !empty($request->get('login', '', 'string'))
             AND !empty($request->get('password', '', 'string'))
             AND !empty($request->get('name', '', 'string'))){
@@ -54,7 +54,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function login(Request $request, UserModel $model, RoleModel $roleModel, DBOConnectorInterface $dbo) {
+    public function login(Request $request, UserModel $model, RoleModel $roleModel) {
 
         if( !empty($request->get('login', '', 'string'))
             AND !empty($request->get('password', '', 'string'))) {
@@ -89,7 +89,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function logout(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
+    public function logout(Request $request, UserModel $model) {
         if($userid = $request->get('id', '', 'integer')) {
             $params = [
                 'token' => ''
@@ -109,7 +109,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function resetpassword(Request $request, UserModel $model, DBOConnectorInterface $dbo) {
+    public function resetpassword(Request $request, UserModel $model) {
         if($login = $request->get('login', '', 'string')) {
             $user = $model->findByEmailBeforeSignUp($login);
         }
@@ -131,7 +131,7 @@ class UserController
      * @return mixed
      * @throws AuthRequiredException
      */
-    public function userinfo(Request $request, UserModel $model, RoleModel $roleModel, DBOConnectorInterface $dbo) {
+    public function userinfo(Request $request, UserModel $model, RoleModel $roleModel) {
         if($token = $request->getHeader('X-Auth')){
             if($user = $model->findByToken($token)){
                 return ['token' => $user->token, 'userId' => $user->id, 'login' => $user->email, 'userRole' => $roleModel->findByRoleId($user->role)];
