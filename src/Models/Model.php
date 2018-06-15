@@ -55,6 +55,55 @@ abstract class Model
     }
 
     /**
+     * @param string|array $data
+     * @param bool $ignoreAlias
+     * @return string
+     */
+    protected function prepareValues($data){
+        if (!empty($data)) {
+            $data ='(`'.implode('`, `', array_keys($data)).'`) VALUES("'.implode('", "', array_values($data)).'")';
+            return $data;
+        }
+    }
+
+    /**
+     * @param string|array $data
+     * @return string
+     */
+    protected function prepareValuesSet($data)
+    {
+        if (\is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->prepareNull($value);
+            }
+            foreach ($data as $key => $value) {
+                $data[$key] = "`{$key}` = " . $value;
+            }
+            $data = implode(', ', $data);
+        }
+        return trim($data);
+    }
+
+    /**
+     * @param string|null $value
+     * @return string
+     */
+    protected function prepareNull($value)
+    {
+        switch (true) {
+            case ($value === null || (\is_scalar($value) && strtolower($value) === 'null')):
+                $value = 'NULL';
+                break;
+            case \is_scalar($value):
+                $value = "'" . $value . "'";
+                break;
+            default:
+                return false;
+        }
+        return $value;
+    }
+
+    /**
      * @param array|string $data
      * @return string
      */
@@ -132,6 +181,42 @@ abstract class Model
         }
 
         return ($mode === 'insert') ? $this->insert($params) : $this->update($params, $where);
+    }
+
+    /**
+     * Save record state to db
+     *
+     * @return bool
+     */
+    public function insert($params) {
+        if(!empty($params)) {
+            $useFields = null;
+            $lid = null;
+            if (\is_array($params)) {
+                $useFields = $this->prepareValues($params);
+            } else {
+                $useFields = $params;
+            }
+            $sql = "INSERT INTO `{$this->tableName}` {$useFields}";
+            return $this->dbo->setQuery($sql);
+        }
+    }
+
+    /**
+     * Update record state to db
+     *
+     * @return bool
+     */
+    public function update($params, $where = '')
+    {
+        $params = $this->prepareValuesSet($params);
+        if (mb_strtoupper(mb_substr($params, 0, 4)) !== 'SET ') {
+            $params = 'SET ' . $params;
+        }
+        $where = $this->prepareWhere($where);
+        $sql = "UPDATE `{$this->tableName}` {$params} {$where}";
+
+        return $this->dbo->setQuery($sql);
     }
 
     /**
